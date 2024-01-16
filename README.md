@@ -1,0 +1,1 @@
+The YOLOv5 code part only shows the actual use. You need to download the complete source code yourself. Intrusion detection in specific areas.py and Mouse frame selection rectangular area.py are interactive implementation parts.

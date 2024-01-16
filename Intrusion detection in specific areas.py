@@ -1,0 +1,58 @@
+import cv2
+from playsound import playsound
+
+def OnMouseAction(event, x, y, flags, param):
+    global img, position1, position2, a
+    if event == cv2.EVENT_LBUTTONDOWN:  # 按下左键
+        position1 = (x, y)
+        position2 = None
+
+    if event == cv2.EVENT_MOUSEMOVE and flags == cv2.EVENT_FLAG_LBUTTON:  # 按住左键拖曳不放开
+        position2 = (x, y)
+        a = 0
+
+    elif event == cv2.EVENT_LBUTTONUP:  # 放开左键
+        position2 = (x, y)
+        a = 1
+
+
+if __name__ == '__main__':
+    cap = cv2.VideoCapture(1)
+    face_cascade = cv2.CascadeClassifier("E:\python\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml")
+    cv2.namedWindow('image')
+    cv2.namedWindow('image2')
+    cv2.setMouseCallback('image', OnMouseAction)
+    position1 = None
+    position2 = None
+    img = None
+    a = 0
+    c=0
+    while (1):
+        ret, img = cap.read()
+        img2 = img.copy()
+        if ret:
+            if position1 != None:
+                cv2.rectangle(img, position1, position2, (255, 0, 0), 3, 4)
+                if position2 != None:
+                    if a == 1:
+                        x = position1[0]
+                        y = position1[1]
+                        xw = position2[0]
+                        yh = position2[1]
+                        cut_img = img2[y:yh, x:xw]
+                        faces = face_cascade.detectMultiScale(cut_img, scaleFactor=1.2, minNeighbors=3,
+                                                              minSize=(32, 32))
+                        for (x1, y1, w, h) in faces:
+                            cv2.rectangle(img, (x1+x, y1+y), (x+x1 + w, y+y + h), (0, 0, 255), 3)
+                            if x1>0:
+                                print('Waring'+str(c))
+                                c=c+1
+
+                                #playsound('E:/01.mp3')
+                        cv2.imshow('image2', cut_img)
+
+        cv2.imshow('image', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
